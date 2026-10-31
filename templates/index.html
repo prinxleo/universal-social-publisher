@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Publisher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #090d16; color: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px; }
+        .card { width: 100%; max-width: 620px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        h1 { font-size: 22px; font-weight: 700; margin-bottom: 24px; text-align: center; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .field { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 8px; }
+        input[type="text"], textarea { width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; transition: 0.2s; }
+        input[type="text"]:focus, textarea:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
+        button { border: none; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        button:active { transform: scale(0.98); }
+        .btn-tt { background: #010101; border: 1px solid #27272a; }
+        .btn-tt:hover { background: #18181b; }
+        .btn-meta { background: #1877f2; }
+        .btn-meta:hover { background: #166fe5; }
+        .btn-yt { background: #ef4444; }
+        .btn-yt:hover { background: #dc2626; }
+        .btn-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .btn-ig:hover { opacity: 0.9; }
+        #status { margin-top: 20px; padding: 12px; border-radius: 10px; font-size: 13px; text-align: center; display: none; }
+        .status-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Universal Social Publisher 🚀</h1>
+        
+        <div class="field">
+            <label>Video Absolute Path (.mp4)</label>
+            <input type="text" id="videoPath" placeholder="C:\path\to\your\video.mp4">
+        </div>
+
+        <div class="field">
+            <label>Caption & Hashtags</label>
+            <textarea id="captionText" rows="4" placeholder="Enter title, description, or tags..."></textarea>
+        </div>
+
+        <div class="grid">
+            <button class="btn-tt" onclick="publish('tiktok')">🎵 TikTok Studio</button>
+            <button class="btn-meta" onclick="publish('meta')">🔵 Meta Business Suite</button>
+            <button class="btn-yt" onclick="publish('youtube')">🔴 YouTube Studio</button>
+            <button class="btn-ig" onclick="publish('instagram')">📸 Instagram Web</button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        async function publish(platform) {
+            const videoPath = document.getElementById('videoPath').value.trim();
+            const caption = document.getElementById('captionText').value.trim();
+            const statusEl = document.getElementById('status');
+
+            if (!videoPath) {
+                showMsg("Video ka absolute path lazmi enter kijiye!", "error");
+                return;
+            }
+
+            showMsg(`${platform.toUpperCase()} automation trigger ho chuki hai...`, "success");
+
+            try {
+                const res = await fetch('/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform, video_path: videoPath, caption })
+                });
+                const data = await res.json();
+                showMsg(data.message, data.status);
+            } catch (err) {
+                showMsg("Server response mein masla aya!", "error");
+            }
+        }
+
+        function showMsg(msg, type) {
+            const el = document.getElementById('status');
+            el.style.display = 'block';
+            el.innerText = msg;
+            el.className = type === 'success' ? 'status-success' : 'status-error';
+        }
+    </script>
+</body>
+</html>
